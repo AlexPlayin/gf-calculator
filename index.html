@@ -1,0 +1,177 @@
+<html>
+<head>
+    <title>Galois Field Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+</head>
+
+<body> 
+    <h1>Galois Field long division calculator</h1>
+    <div class="row">
+
+    <div class="input-field col s7">
+        <input type="text" placeholder="Enter number 1" id="number1"/>
+        
+    </div>
+    <div class="col s4">
+        <div class="row" style="margin-top: 20px">
+            <div class="col s3">
+                <label>
+                    <input name="num1" type="radio" value="2" onchange="runCalc()"/>
+                    <span>Binary</span>
+                </label>
+            </div>
+            <div class="col s3">
+                <label>
+                    <input name="num1" type="radio" value="16" onchange="runCalc()"/>
+                    <span>Hex</span>
+                </label>
+            </div>
+            <div class="col s3">
+                <label>
+                    <input name="num1" type="radio" value="10" onchange="runCalc()"/>
+                    <span >Decimal</span>
+                </label>
+            </div>
+            <div class="col s3">
+                <label>
+                    <input name="num1" type="radio" value="auto" onchange="runCalc()" checked/>
+                    <span >Auto</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="col s1" id="type-1">
+    </div>
+    <div class="input-field col s7">
+        <input type="text" placeholder="Enter number 2" id="number2"/>
+    </div>
+    <div class="col s4">
+        <div class="row" style="margin-top: 20px">
+            <div class="col s3">
+                <label>
+                    <input name="num2" type="radio" value="2" onchange="runCalc()"/>
+                    <span>Binary</span>
+                </label>
+            </div>
+            <div class="col s3">
+                <label>
+                    <input name="num2" type="radio" value="16" onchange="runCalc()"/>
+                    <span>Hex</span>
+                </label>
+            </div>
+            <div class="col s3">
+                <label>
+                    <input name="num2" type="radio" value="10" onchange="runCalc()"/>
+                    <span >Decimal</span>
+                </label>
+            </div>
+            <div class="col s3">
+                <label>
+                    <input name="num2" type="radio" value="auto" onchange="runCalc()" checked/>
+                    <span >Auto</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="col s1" id="type-2">
+    </div>
+    <div class="col s12">
+        <h4>Binary remainder: <span id="result-bin"> </span><br></h4>
+        <h4>Hex remainder: <span id="result-hex"> </span><br></h4>
+        <h4>Decimal remainder: <span id="result-dec"> </span><br></h4>
+    </div>
+
+    </div>
+    <script>
+    function getmsb(number) {
+        let counter = 0;
+        while(true) {
+            console.log(1)
+            if (number === 1 || number === 0) {return counter};
+            number = number >> 1;
+            counter++;
+        }
+    }
+    
+    function div(a, b) {
+        const target = getmsb(b);
+        let result = a;
+        while(getmsb(result) >= target && target != 0) {
+            console.log(2,getmsb(result), target)
+
+            const card = getmsb(result);
+            const temp = b << (card - target);
+            result = result ^ temp;
+            console.log(card, temp, result)
+        }
+        return result;
+    }
+       
+    function inputToNumber(input) {
+        if (input.match(/^(0x|0X)[a-fA-F0-9]+$/)) {
+            // Hex
+            return [parseInt(input, 16), "hex"];
+        } else if (input.match(/^b?[0-1]+$/)) {
+            // Binary
+            return [parseInt(input, 2), "bin"];
+        } else if (input.match(/^[0-9]+$/)) {
+            // Decimal
+            return [parseInt(input, 10), "dec"];
+        }
+    }
+
+    function getRadioBtnValue(groupname) {
+        let rbs = document.querySelectorAll('input[name="' + groupname + '"]');
+        let selectedValue;
+            for (const rb of rbs) {
+                if (rb.checked) {
+                    selectedValue = rb.value;
+                    break;
+                }
+            }
+        return selectedValue
+    }
+
+    function runCalc(e) {
+
+        let number1;
+
+        if (getRadioBtnValue("num1") === "auto") {
+            number1R = inputToNumber(document.getElementById("number1").value);        
+            document.getElementById("type-1").innerHTML = "<p>" + number1R[1] + "</p>"
+            number1 = number1R[0]
+        } else {
+            number1 = parseInt(document.getElementById("number1").value || 0, parseInt(getRadioBtnValue("num1")))
+            document.getElementById("type-1").innerHTML = "<p></p>"
+
+        }
+        
+        let number2;
+        if (getRadioBtnValue("num2") === "auto") {
+            number2R = inputToNumber(document.getElementById("number2").value);        
+            document.getElementById("type-2").innerHTML = "<p>" + number2R[1] + "</p>"
+            number2 = number2R[0]
+        } else {
+            number2 = parseInt(document.getElementById("number2").value || 0, parseInt(getRadioBtnValue("num2")))
+            document.getElementById("type-2").innerHTML = "<p></p>"
+
+        }
+
+        const result = div(number1, number2);
+
+        document.getElementById("result-bin").innerHTML = result.toString(2)
+        document.getElementById("result-hex").innerHTML = result.toString(16)
+        document.getElementById("result-dec").innerHTML = result.toString(10)
+
+    }
+
+    document.getElementById("number1").addEventListener('input', runCalc);
+    document.getElementById("number2").addEventListener('input', runCalc);
+    document.getElementById("num1").addEventListener('input', runCalc);
+    document.getElementById("num2").addEventListener('input', runCalc);
+
+    </script>
+</body>
+
+</html>
